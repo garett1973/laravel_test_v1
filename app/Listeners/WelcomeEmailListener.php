@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Jobs\SendWelcomeNotificationJob;
 use App\Notifications\WelcomeEmailNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -27,6 +28,6 @@ class WelcomeEmailListener
      */
     public function handle(Registered $event)
     {
-        $event->user->notify(new WelcomeEmailNotification());
+//        $event->user->notify(new WelcomeEmailNotification());
     }
 }

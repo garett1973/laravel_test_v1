@@ -3,6 +3,7 @@
 namespace App\Models\Users\Services;
 
 use App\Http\Resources\UserResource;
+use App\Jobs\SendWelcomeNotificationJob;
 use App\Models\Users\Repositories\Interfaces\UserRepositoryInterface;
 use App\Models\Users\Services\Interfaces\UserServiceInterface;
 use App\Traits\HttpResponses;
@@ -62,9 +63,8 @@ class UserService implements UserServiceInterface
         ]);
 
         if ($user->email) {
-//            $userModel = $this->userRepository->getUserByEmail($array['email']);
-//            event(new Registered($userModel));
-            event(new Registered($user));
+//            event(new Registered($user));
+            SendWelcomeNotificationJob::dispatch($user)->delay(now()->addSeconds(20));
         }
 
         if ($auth && $user) {
