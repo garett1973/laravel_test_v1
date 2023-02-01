@@ -30,3 +30,4 @@ Route::middleware('throttle:3, 1')->post('/login', [UserController::class, 'logi
 //        Route:: middleware('throttle:1, 10')->post('/login', [UserController::class, 'login']);
 //    });
 //});
+
