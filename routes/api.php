@@ -21,5 +21,12 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 // Public routes
-Route::post('/login', [UserController::class, 'login']);
+
 Route::post('/register', [UserController::class, 'register']);
+Route::middleware('throttle:3, 1')->post('/login', [UserController::class, 'login']);
+
+//Route::middleware('throttle:3, 30')->group(function () {
+//    Route::middleware('throttle:2, 20')->group(function () {
+//        Route:: middleware('throttle:1, 10')->post('/login', [UserController::class, 'login']);
+//    });
+//});

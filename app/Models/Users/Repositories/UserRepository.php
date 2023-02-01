@@ -26,4 +26,13 @@ class UserRepository implements UserRepositoryInterface
     {
         return $this->user::where('email', $email)->first();
     }
+
+    /**
+     * @param mixed $phone
+     * @return mixed
+     */
+    public function getUserByPhone(mixed $phone)
+    {
+        return $this->user::where('phone', $phone)->first();
+    }
 }

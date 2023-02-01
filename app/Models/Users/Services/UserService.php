@@ -3,13 +3,13 @@
 namespace App\Models\Users\Services;
 
 use App\Http\Resources\UserResource;
-use App\Jobs\SendWelcomeNotificationJob;
+use App\Jobs\SendWelcomeMessageJob;
 use App\Models\Users\Repositories\Interfaces\UserRepositoryInterface;
 use App\Models\Users\Services\Interfaces\UserServiceInterface;
 use App\Traits\HttpResponses;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 
 /**
@@ -27,9 +27,10 @@ class UserService implements UserServiceInterface
         $this->userRepository = $userRepository;
     }
 
-    public function login(mixed $email, mixed $password, mixed $phone)
+    public function login(mixed $email, mixed $password,  mixed $phone): array|string
     {
-        if ($this->getLoggedUser()) {
+
+        if (Auth::check()) {
             return $this->error('', 403, 'User already logged in!');
         }
 
@@ -43,15 +44,15 @@ class UserService implements UserServiceInterface
                     'phone' => $phone,
                     'password' => $password,
                 ])) {
-            $token = Auth::user()->createToken('user-token');
+
             return [
-                'token' => $token->plainTextToken
+                'token' => Auth::user()->createToken('user-token')->plainTextToken
             ];
         }
         return $this->error('', 401, 'Invalid login details');
     }
 
-    public function register(array $array, bool $auth = false): array|UserResource
+    public function register(array $array, bool $auth = false): UserResource
     {
 
         $user = $this->userRepository->createUser([
@@ -63,17 +64,10 @@ class UserService implements UserServiceInterface
         ]);
 
         if ($user->email) {
-//            event(new Registered($user));
-            SendWelcomeNotificationJob::dispatch($user)->delay(now()->addSeconds(20));
+            SendWelcomeMessageJob::dispatch($user)->delay(now()->addSeconds(2));
         }
 
-        if ($auth && $user) {
-            $token = $user->createToken('user-token');
-            return [
-                'user_id' => $user->id,
-                'token' => $token->plainTextToken
-            ];
-        }
+            $user->token = $user->createToken('user-token')->plainTextToken;
         return new UserResource($user);
     }
 
@@ -87,3 +81,4 @@ class UserService implements UserServiceInterface
         return new UserResource($user);
     }
 }
+

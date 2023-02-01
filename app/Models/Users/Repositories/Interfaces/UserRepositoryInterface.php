@@ -7,4 +7,6 @@ interface UserRepositoryInterface
     public function createUser(array $data);
 
     public function getUserByEmail(mixed $email);
+
+    public function getUserByPhone(mixed $phone);
 }

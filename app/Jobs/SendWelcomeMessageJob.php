@@ -2,30 +2,30 @@
 
 namespace App\Jobs;
 
+use App\Mail\WelcomeMessage;
 use App\Models\Users\User;
-use App\Notifications\WelcomeEmailNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Mail;
 
-class SendWelcomeNotificationJob implements ShouldQueue
+class SendWelcomeMessageJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * The user to send the welcome notification to.
+     * The user instance.
      *
      * @var User
      */
-    protected User $user;
+    private $user;
 
     /**
      * Create a new job instance.
      *
-     * @param User $user
      * @return void
      */
     public function __construct(User $user)
@@ -40,6 +40,6 @@ class SendWelcomeNotificationJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->user->notify(new WelcomeEmailNotification());
+        Mail::to($this->user->email)->send(new WelcomeMessage($this->user));
     }
 }
